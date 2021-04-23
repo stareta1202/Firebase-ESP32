@@ -1358,13 +1358,16 @@ bool FB_RTDB::setTimestamp(FirebaseData *fbdo, const char *path)
     return ret;
 }
 
-bool FB_RTDB::getTimestamp(FirebaseData *fbdo)
+bool FB_RTDB::getTimestamp(FirebaseData *fbdo, const char *path)
 {
     char *tmp = ut->strP(fb_esp_pgm_str_154);
     struct fb_esp_rtdb_request_info_t req;
+    // req.path = path;
     req.path = "";
-    req.method = m_get;
+    req.method = m_put;
+
     req.dataType = d_timestamp;
+    req.payload = tmp;
     req.queue = false;
     bool ret = processRequestTimestamp(fbdo, &req);
     ut->delS(tmp);
@@ -1444,7 +1447,7 @@ bool FB_RTDB::get(FirebaseData *fbdo, const char *path)
     fbdo->queryFilter.clear();
     struct fb_esp_rtdb_request_info_t req;
     req.path = path;
-    req.method = m_get;
+    req.method = m_put;
     req.dataType = d_any;
     req.storageType = mem_storage_type_undefined;
     return handleRequest(fbdo, &req);
@@ -3082,7 +3085,7 @@ bool FB_RTDB::processRequest(FirebaseData *fbdo, struct fb_esp_rtdb_request_info
     return ret;
 }
 
-bool FB_RTDB::processRequestTimestamp(FirebaseData *fbdp, struct fb_esp_rtdb_request_info_t *req) 
+bool FB_RTDB::processRequestTimestamp(FirebaseData *fbdo, struct fb_esp_rtdb_request_info_t *req) 
 {
     if (!fbdo->reconnect())
         return false;
@@ -3092,7 +3095,7 @@ bool FB_RTDB::processRequestTimestamp(FirebaseData *fbdp, struct fb_esp_rtdb_req
     fbdo->queryFilter.clear();
 
     uint8_t errCount = 0;
-    uint8_t masRetry = fbdo->_ss.rtdb.max_retry;
+    uint8_t maxRetry = fbdo->_ss.rtdb.max_retry;
     if (maxRetry == 0)
         maxRetry = 1;
     for (int i = 0; i < maxRetry; i++)
@@ -3117,7 +3120,6 @@ bool FB_RTDB::processRequestTimestamp(FirebaseData *fbdp, struct fb_esp_rtdb_req
         if (req->method == fb_esp_method::m_put || req->method == fb_esp_method::m_put_nocontent || req->method == fb_esp_method::m_post || req->method == fb_esp_method::m_patch || req->method == fb_esp_method::m_patch_nocontent)
             fbdo->addQueue(&qinfo);
     
-    f
     return ret;
 }
 

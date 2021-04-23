@@ -1009,6 +1009,11 @@ bool FirebaseESP32::setTimestamp(FirebaseData &fbdo, const String &path)
     return RTDB.setTimestamp(&fbdo, path.c_str());
 }
 
+bool FirebaseESP32::getTimestamp(FirebaseData &fbdo, const String &path)
+{
+    return RTDB.getTimestamp(&fbdo, path.c_str());
+}
+
 bool FirebaseESP32::updateNode(FirebaseData &fbdo, const String path, FirebaseJson &json)
 {
     return RTDB.updateNode(&fbdo, path.c_str(), &json);

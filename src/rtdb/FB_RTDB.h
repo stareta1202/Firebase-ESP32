@@ -815,7 +815,7 @@ public:
   */
   bool setTimestamp(FirebaseData *fbdo, const char *path);
   
-  bool getTimestamp(FirebaseData *fbdo);
+  bool getTimestamp(FirebaseData *fbdo, const char *path);
 
   /** Update (patch) the child (s) nodes to the defined node.
    * 

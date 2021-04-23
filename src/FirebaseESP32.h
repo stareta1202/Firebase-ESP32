@@ -962,6 +962,9 @@ public:
   */
   bool setTimestamp(FirebaseData &fbdo, const String &path);
 
+  bool getTimestamp(FirebaseData &fbdo, const String &path);
+
+
   /** Update the child node key or existing key's value (using FirebaseJson object) under the defined database path.
    * 
    * @param fbdo Firebase Data Object to hold data and instance.
