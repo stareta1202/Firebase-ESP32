@@ -1358,6 +1358,19 @@ bool FB_RTDB::setTimestamp(FirebaseData *fbdo, const char *path)
     return ret;
 }
 
+bool FB_RTDB::getTimestamp(FirebaseData *fbdo)
+{
+    char *tmp = ut->strP(fb_esp_pgm_str_154);
+    struct fb_esp_rtdb_request_info_t req;
+    req.path = "";
+    req.method = m_get;
+    req.dataType = d_timestamp;
+    req.queue = false;
+    bool ret = processRequestTimestamp(fbdo, &req);
+    ut->delS(tmp);
+    return ret;
+}
+
 bool FB_RTDB::updateNode(FirebaseData *fbdo, const char *path, FirebaseJson *json)
 {
     std::string s;
@@ -3066,6 +3079,45 @@ bool FB_RTDB::processRequest(FirebaseData *fbdo, struct fb_esp_rtdb_request_info
         if (req->method == fb_esp_method::m_put || req->method == fb_esp_method::m_put_nocontent || req->method == fb_esp_method::m_post || req->method == fb_esp_method::m_patch || req->method == fb_esp_method::m_patch_nocontent)
             fbdo->addQueue(&qinfo);
 
+    return ret;
+}
+
+bool FB_RTDB::processRequestTimestamp(FirebaseData *fbdp, struct fb_esp_rtdb_request_info_t *req) 
+{
+    if (!fbdo->reconnect())
+        return false;
+    if (!fbdo->tokenReady())
+        return false;
+    bool ret = false;
+    fbdo->queryFilter.clear();
+
+    uint8_t errCount = 0;
+    uint8_t masRetry = fbdo->_ss.rtdb.max_retry;
+    if (maxRetry == 0)
+        maxRetry = 1;
+    for (int i = 0; i < maxRetry; i++)
+    {
+        ret = handleRequest(fbdo, req);
+        if (ret)
+            break;
+        if (fbdo->_ss.rtdb.max_retry > 0)
+            if (!ret && connectionError(fbdo))
+                errCount++;
+    }     struct fb_esp_rtdb_queue_info_t qinfo;
+
+    qinfo.method = req->method;
+    qinfo.storageType = req->storageType;
+    qinfo.dataType = req->dataType;
+    qinfo.path = req->path;
+    qinfo.filename = "";
+    qinfo.payload = req->payload;
+    qinfo.isQuery = false;
+
+    if (!req->queue && !ret && errCount == maxRetry && fbdo->_qMan._maxQueue > 0)
+        if (req->method == fb_esp_method::m_put || req->method == fb_esp_method::m_put_nocontent || req->method == fb_esp_method::m_post || req->method == fb_esp_method::m_patch || req->method == fb_esp_method::m_patch_nocontent)
+            fbdo->addQueue(&qinfo);
+    
+    f
     return ret;
 }
 

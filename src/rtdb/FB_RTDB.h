@@ -814,6 +814,8 @@ public:
    * use printf("%.0lf\n", firebaseData.doubleData());.
   */
   bool setTimestamp(FirebaseData *fbdo, const char *path);
+  
+  bool getTimestamp(FirebaseData *fbdo);
 
   /** Update (patch) the child (s) nodes to the defined node.
    * 
@@ -1519,6 +1521,7 @@ private:
   bool handleResponse(FirebaseData *fbdo);
   void handlePayload(FirebaseData *fbdo, struct server_response_data_t &response, const char *payload);
   bool processRequest(FirebaseData *fbdo, struct fb_esp_rtdb_request_info_t *req);
+  bool processRequestTimestamp(FirebaseData *fbdo, struct fb_esp_rtdb_request_info_t *req);
   bool processRequestFile(FirebaseData *fbdo, struct fb_esp_rtdb_request_info_t *req);
   bool pushInt(FirebaseData *fbdo, const char *path, int intValue, bool queue, const char *priority);
   bool pushFloat(FirebaseData *fbdo, const char *path, float floatValue, bool queue, const char *priority);
